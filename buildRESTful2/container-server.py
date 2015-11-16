@@ -136,7 +136,7 @@ def containers_remove_all():
 
     """
     output = docker('stop', docker('ps','-a','-q'))
-    output2 = docker('rm', docker('ps', '-a', '-q'), '-f')
+    output2 = docker('rm', docker('ps', '-a', '-q'))
     resp = output2
     return Response(response=resp, mimetype="application/json")
 
@@ -145,9 +145,13 @@ def images_remove_all():
     """
     Force remove all images - dangrous!
 
+    My command:
+    curl -s -X DELETE -H 'Accept: application/json' 83.212.127.223:8081/containers
+
     """
- 
-    resp = ''
+    
+    output = docker('rmi', docker('images', '-q'))
+    resp = output
     return Response(response=resp, mimetype="application/json")
 
 
@@ -198,21 +202,25 @@ def containers_update(id):
         state = body['state']
         if state == 'running':
             docker('restart', id)
+        if state == 'stopped':
+            docker('stop', id)
     except:
         pass
 
     resp = '{"id": "%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
-@app.route('/images/<id>', methods=['PATCH'])
-def images_update(id):
+@app.route('/images/<id>/<tag>', methods=['PATCH'])
+def images_update(id, tag):
     """
     Update image attributes (support: name[:tag])  tag name should be lowercase only
 
     curl -s -X PATCH -H 'Content-Type: application/json' http://localhost:8080/images/7f2619ed1768 -d '{"tag": "test:1.0"}'
 
     """
-    resp = ''
+
+    docker('tag', id, tag)
+    resp = '{"id": "%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
 
