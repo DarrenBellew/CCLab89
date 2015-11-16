@@ -46,6 +46,8 @@ def containers_index():
     else:
         output = docker('ps', '-a')
 
+    print("It got ran")
+
     resp = json.dumps(docker_ps_to_array(outout))
     return Response(response=resp, mimetype="application/json")
 
