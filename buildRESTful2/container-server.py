@@ -40,6 +40,8 @@ def containers_index():
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers | python -mjson.tool
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers?state=running | python -mjson.tool
 
+    My command:
+    curl -s -X GET -H 'Accept: application/json' 83.212.127.223:8081/containers
     """
     if request.args.get('state') == 'running':
         output = docker('ps')
@@ -57,6 +59,10 @@ def images_index():
     List all images 
     
     Complete the code below generating a valid response. 
+
+    My command:
+    curl -s -X GET -H 'Accept: application/json' 83.212.127.223:8081/images
+
     """
     
     output = docker('images');
@@ -71,6 +77,9 @@ def containers_show(id):
     """
     Inspect specific container
 
+    My command:
+    curl -s -X GET -H 'Accept: application/json' 83.212.127.223:8081/containers/<id>
+
     """
     
     
@@ -83,6 +92,9 @@ def containers_log(id):
     """
     Dump specific container logs
 
+    My command:
+    curl -s -X GET -H 'Accept: application/json' 83.212.127.223:8081/containers/<id>/logs
+
     """
     output = docker('logs', id)
     resp = json.dumps(docker_logs_to_object(output))
@@ -94,6 +106,9 @@ def containers_log(id):
 def images_remove(id):
     """
     Delete a specific image
+
+    My command:
+    curl -s -X DELETE -H 'Accept: application/json' 83.212.127.223:8081/images/<id>
     """
     docker ('rmi', id)
     resp = '{"id": "%s"}' % id
@@ -104,8 +119,12 @@ def containers_remove(id):
     """
     Delete a specific container - must be already stopped/killed
 
+    My command: 
+    curl -s -X DELETE -H 'Accept: application/json' 83.212.127.223:8081/containers/<id>
+
     """
-    resp = ''
+    docker('rm', id)
+    resp = '{"id":"%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers', methods=['DELETE'])
@@ -113,8 +132,12 @@ def containers_remove_all():
     """
     Force remove all containers - dangrous!
 
+
+    
     """
-    resp = ''
+    output = docker('stop', docker('ps','-a','-q'))
+    output2 = docker('rm', docker('ps', '-a', '-q'))
+    resp = output2
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/images', methods=['DELETE'])
