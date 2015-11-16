@@ -63,7 +63,7 @@ def images_index():
 
     #print "curl -s -X GET -H 'Accept: application/json' <url>:<port>/images"
 
-    resp = json.dumps(docker_ps_to_array(output))
+    resp = json.dumps(docker_images_to_array(output))
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers/<id>', methods=['GET'])
@@ -73,9 +73,9 @@ def containers_show(id):
 
     """
     
-    output = docker('inspect', id)
+    
 
-    resp = json.dumps(docker_ps_to_array(output))
+    resp = docker('inspect', id)
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers/<id>/logs', methods=['GET'])
@@ -85,8 +85,8 @@ def containers_log(id):
 
     """
     output = docker('logs', id)
+    resp = json.dumps(docker_logs_to_object(output))
 
-    resp = json.dumps(docker_ps_to_array(output))
     return Response(response=resp, mimetype="application/json")
 
 
