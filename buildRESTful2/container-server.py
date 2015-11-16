@@ -46,7 +46,7 @@ def containers_index():
     else:
         output = docker('ps', '-a')
 
-    print("It got ran")
+    #print("It got ran")
 
     resp = json.dumps(docker_ps_to_array(output))
     return Response(response=resp, mimetype="application/json")
@@ -59,7 +59,11 @@ def images_index():
     Complete the code below generating a valid response. 
     """
     
-    resp = ''
+    output = docker('images');
+
+    print "curl -s -X GET -H 'Accept: application/json' <url>:<port>/images"
+
+    resp = json.dumps(docker_ps_to_array(output))
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers/<id>', methods=['GET'])
