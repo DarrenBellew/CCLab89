@@ -133,10 +133,10 @@ def containers_remove_all():
     Force remove all containers - dangrous!
 
 
-    
+
     """
     output = docker('stop', docker('ps','-a','-q'))
-    output2 = docker('rm', docker('ps', '-a', '-q'))
+    output2 = docker('rm', docker('ps', '-a', '-q'), '-f')
     resp = output2
     return Response(response=resp, mimetype="application/json")
 
