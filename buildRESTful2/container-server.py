@@ -48,7 +48,7 @@ def containers_index():
 
     print("It got ran")
 
-    resp = json.dumps(docker_ps_to_array(outout))
+    resp = json.dumps(docker_ps_to_array(output))
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/images', methods=['GET'])
@@ -240,4 +240,4 @@ def docker_images_to_array(output):
     return all
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",port=8080, debug=True)
+    app.run(host="0.0.0.0",port=8081, debug=True)
