@@ -168,7 +168,11 @@ def containers_create():
     body = request.get_json(force=True)
     image = body['image']
     args = ('run', '-d')
+    if body['publish'] is not None:
+        args.extend(['-p',body['publish']])
+    
     id = docker(*(args + (image,)))[0:12]
+    
     return Response(response='{"id": "%s"}' % id, mimetype="application/json")
 
 
@@ -222,7 +226,7 @@ def images_update(id):
     body = request.get_json(force=True)
     tagOP = body['tag']
 
-    docker('tag', id, tag)
+    docker('tag', id, tagOP)
 
     resp = '{"id": "%s" | tag : +'tagOP'}' % id
     return Response(response=resp, mimetype="application/json")
