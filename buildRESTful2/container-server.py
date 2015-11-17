@@ -172,8 +172,8 @@ def containers_create():
     return Response(response='{"id": "%s"}' % id, mimetype="application/json")
 
 
-@app.route('/images', methods=['POST'])
-def images_create():
+@app.route('/images/<id>', methods=['POST'])
+def images_create(id):
     """
     Create image (from uploaded Dockerfile)
 
@@ -181,8 +181,9 @@ def images_create():
 
     """
     dockerfile = request.files['file']
-    
-    resp = ''
+    output = docker('build', '-rm', id)
+
+    resp = output 
     return Response(response=resp, mimetype="application/json")
 
 
@@ -210,17 +211,20 @@ def containers_update(id):
     resp = '{"id": "%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
-@app.route('/images/<id>/<tag>', methods=['PATCH'])
-def images_update(id, tag):
+@app.route('/images/<id>', methods=['PATCH'])
+def images_update(id):
     """
     Update image attributes (support: name[:tag])  tag name should be lowercase only
 
     curl -s -X PATCH -H 'Content-Type: application/json' http://localhost:8080/images/7f2619ed1768 -d '{"tag": "test:1.0"}'
 
     """
+    body = request.get_json(force=True)
+    tagOP = body['tag']
 
     docker('tag', id, tag)
-    resp = '{"id": "%s"}' % id
+
+    resp = '{"id": "%s" | tag : +'tagOP'}' % id
     return Response(response=resp, mimetype="application/json")
 
 
