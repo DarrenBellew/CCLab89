@@ -187,8 +187,15 @@ def images_create():
     directory = "./uploads/"
     dockerfile = request.files['file'].saves(directory + "Dockerfile")
     output = docker('build', '--rm', '.')
+    resp = ''
 
-    resp = output
+    id = re.search('Successfully build (.*)\n', output, 0)
+
+    if id is not None:
+        resp = '{"id":"%s"}' % id.group(1)
+    else:
+        resp = '{"errormessage": "%s"}' % output
+
     return Response(response=resp, mimetype="application/json")
 
 
