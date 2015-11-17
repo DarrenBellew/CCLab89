@@ -176,18 +176,19 @@ def containers_create():
     return Response(response='{"id": "%s"}' % id, mimetype="application/json")
 
 
-@app.route('/images/<id>', methods=['POST'])
-def images_create(id):
+@app.route('/images', methods=['POST'])
+def images_create():
     """
     Create image (from uploaded Dockerfile)
 
     curl -H 'Accept: application/json' -F file=@Dockerfile http://localhost:8080/images
 
     """
-    dockerfile = request.files['file']
-    output = docker('build', '-rm', id)
+    directory = "./uploads/"
+    dockerfile = request.files['file'].saves(directory + "Dockerfile")
+    output = docker('build', '--rm', '.')
 
-    resp = output 
+    resp = output
     return Response(response=resp, mimetype="application/json")
 
 
