@@ -116,34 +116,10 @@ def images_remove(id):
         
 
     docker ('rmi', "-r", id)
-    resp = '{"id": "%s"}' % id
+    resp = '{"id": "%s"} was killed' % id
     return Response(response=resp, mimetype="application/json")
     
-def stopAndDelete(id):
-    docker('stop', id)
-    docker('rm', id)
 
-def getContainers(): 
-    ids = []
-
-    output = docker('ps')
-    containers = docker_ps_to_array(output)
-
-    for i in containers:
-        ids.extend(i["id"])
-
-    return ids
-
-def getAllContainers():
-    ids = []
-
-    output = docker('ps', '-a')
-    containers = docker_ps_to_array(output)
-
-    for i in containers:
-        ids.extend(i["id"])
-
-    return ids
 
 
 @app.route('/containers/<id>', methods=['DELETE'])
@@ -157,7 +133,7 @@ def containers_remove(id):
     """
 
     stopAndDelete(id)
-    resp = '{"id":"%s"}' % id
+    resp = '{"id":"%s"} was killed' % id
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers', methods=['DELETE'])
@@ -185,21 +161,17 @@ def images_remove_all():
     """
     
     output = getAllContainers()
+    
     for i in output:
         stopAndDelete(i)
-    output = getAllImages
+    output = getAllImages()
+
     for i in output:
         docker('rmi', i)
     resp = "WARNING: All Images (and containers stopped and ) deleted"
     return Response(response=resp, mimetype="application/json")
 
-def getAllImages():
-    output = docker('images')
-    output = docker_ps_to_array(output)
-    for i in containers:
-        ids.extend(i["id"])
 
-    return output
 
 @app.route('/containers', methods=['POST'])
 def containers_create():
@@ -343,3 +315,40 @@ def docker_images_to_array(output):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0",port=8081, debug=True)
+
+
+#MY DEFINES
+
+def stopAndDelete(id):
+    docker('stop', id)
+    docker('rm', id)
+
+def getContainers(): 
+    ids = []
+
+    output = docker('ps')
+    containers = docker_ps_to_array(output)
+
+    for i in containers:
+        ids.extend(i["id"])
+
+    return ids
+
+def getAllContainers():
+    ids = []
+
+    output = docker('ps', '-a')
+    containers = docker_ps_to_array(output)
+
+    for i in containers:
+        ids.extend(i["id"])
+
+    return ids
+
+def getAllImages():
+    output = docker('images')
+    output = docker_ps_to_array(output)
+    for i in containers:
+        ids.extend(i["id"])
+
+    return output
