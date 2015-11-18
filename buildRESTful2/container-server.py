@@ -112,7 +112,7 @@ def images_remove(id):
     """
     ids = getContainers()
     for i in ids:
-        stopAndDeleteContainer(id)
+        stopAndDelete(id)
         
 
     docker ('rmi', "-r", id)
@@ -134,6 +134,18 @@ def getContainers():
 
     return ids
 
+def getAllContainers():
+    ids = []
+
+    output = docker('ps', '-a')
+    containers = docker_ps_to_array(output)
+
+    for i in containers:
+        ids.extend(i["id"])
+
+    return ids
+
+
 @app.route('/containers/<id>', methods=['DELETE'])
 def containers_remove(id):
     """
@@ -144,7 +156,7 @@ def containers_remove(id):
 
     """
 
-    docker('rm', id)
+    stopAndDelete(id)
     resp = '{"id":"%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
@@ -156,9 +168,10 @@ def containers_remove_all():
     curl -s -X DELETE -H 'Accept: application/json' 83.212.127.223:8081/containers
 
     """
-    output = docker('stop', docker('ps','-a','-q'))
-    output2 = docker('rm', docker('ps', '-a', '-q'))
-    resp = output2
+    output = getAllContainers()
+    for i in output:
+        stopAndDelete(i)
+    resp = "WARNING: All containers removed!!!"
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/images', methods=['DELETE'])
@@ -170,11 +183,23 @@ def images_remove_all():
     curl -s -X DELETE -H 'Accept: application/json' 83.212.127.223:8081/containers
 
     """
-    #*
-    output = docker('rmi', '($docker images -q)'))
-    resp = output
+    
+    output = getAllContainers()
+    for i in output:
+        stopAndDelete(i)
+    output = getAllImages
+    for i in output:
+        docker('rmi', i)
+    resp = "WARNING: All Images (and containers stopped and ) deleted"
     return Response(response=resp, mimetype="application/json")
 
+def getAllImages():
+    output = docker('images')
+    output = docker_ps_to_array(output)
+    for i in containers:
+        ids.extend(i["id"])
+
+    return output
 
 @app.route('/containers', methods=['POST'])
 def containers_create():
@@ -251,12 +276,15 @@ def images_update(id):
     curl -s -X PATCH -H 'Content-Type: application/json' http://localhost:8081/images/7f2619ed1768 -d '{"tag": "test:1.0"}'
 
     """
-    body = request.get_json(force=True)
-    tagOP = body['tag']
+    try:
+        body = request.get_json(force=True)
+        tagOP = body['tag']
 
-    docker('tag', id, tagOP)
+        docker('tag', id, tagOP)
 
-    resp = '{"id": "%s" | tag : +'tagOP'}' % id
+        resp = '{"id": "%s" | tag : +'tagOP'}' % id
+    except:
+        resp = "INVALID COMMAND! CHECK YOUR COMMAND"
     return Response(response=resp, mimetype="application/json")
 
 
